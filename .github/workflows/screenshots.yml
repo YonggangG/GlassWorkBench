@@ -1,0 +1,42 @@
+name: Windows application screenshots
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download published Windows application
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download v0.4.2 --pattern '*Windows-x64.zip' --dir portable
+          Expand-Archive portable/GlassWorkbench-v0.4.2-Windows-x64.zip portable/app
+      - name: Capture actual portable application windows
+        shell: pwsh
+        run: |
+          $exe = (Resolve-Path portable/app/GlassWorkbench/GlassWorkbench.exe).Path
+          $output = New-Item -ItemType Directory -Force docs/images
+          Copy-Item CDGM202609.xlsx (Split-Path $exe)
+          Copy-Item 'schott-optical-glass-overview-excel-format-en 202501113.xlsx' (Split-Path $exe)
+          Copy-Item reference/MISC.AGF (Split-Path $exe)
+          foreach ($view in @('main', 'agf', 'help')) {
+            $image = Join-Path $output.FullName "windows-$view.png"
+            $arguments = "--smoke-test --screenshot `"$image`""
+            if ($view -eq 'agf') { $arguments += ' --agf MISC.AGF' }
+            if ($view -eq 'help') { $arguments += ' --smoke-help' }
+            $process = Start-Process -FilePath $exe -ArgumentList $arguments -Wait -PassThru
+            if ($process.ExitCode -ne 0) { throw "Application exited with $($process.ExitCode) for $view" }
+            if (!(Test-Path $image) -or (Get-Item $image).Length -lt 10000) { throw "Missing or empty screenshot: $image" }
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-app-screenshots
+          path: docs/images/windows-*.png
+          if-no-files-found: error
