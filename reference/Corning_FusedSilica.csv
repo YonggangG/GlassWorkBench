@@ -1,0 +1,4 @@
+Glass,Glass_Code,n_1550nm,dn_dT_1550nm_20-25C(10-6/K),OH_Content(ppm),CTE_5_35C(10-6/K),Density(g/cm3),Softening_Point(C),Annealing_Point(C),Strain_Point(C),Primary_Application
+HPFS 7980,7980,1.443987,9.488,800 - 1000,0.52,2.20,1585,1042,893,DUV/Visible/NIR Optics (KrF ArF Standard)
+HPFS 7979,7979,1.444079,9.393,< 1,0.52,2.20,1627,1180,1068,Infrared (IR) & NIR Optics (Low OH)
+HPFS 8655,8655,1.444079,9.393,< 1,0.52,2.20,1627,1180,1068,High-Purity ArF DUV & Broadband/IR Optics

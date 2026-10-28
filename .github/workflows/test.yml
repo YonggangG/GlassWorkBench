@@ -1,0 +1,55 @@
+name: Test and native portable builds
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      build_portable:
+        description: Build native Windows and Ubuntu onedir packages after tests
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    env:
+      QT_QPA_PLATFORM: offscreen
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Ubuntu Qt runtime libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libopengl0 libgl1 libdbus-1-3 libfontconfig1 libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-xinerama0 libxcb-randr0 libxcb-shape0 libxcb-xfixes0
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - name: Install application and development tools
+        run: uv sync --group dev
+      - name: Run synthetic and offscreen GUI tests
+        # Included manufacturer workbooks enable catalog integration checks.
+        run: uv run --no-sync python -m pytest -q -ra
+      - name: Build native Windows portable application
+        if: github.event_name == 'workflow_dispatch' && inputs.build_portable && runner.os == 'Windows'
+        shell: cmd
+        run: build_windows.cmd
+      - name: Build native Ubuntu portable application
+        if: github.event_name == 'workflow_dispatch' && inputs.build_portable && runner.os == 'Linux'
+        run: bash build_ubuntu.sh
+      - name: Upload application only (no external catalogs)
+        if: github.event_name == 'workflow_dispatch' && inputs.build_portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: GlassWorkbench-${{ runner.os }}-${{ runner.arch }}
+          path: dist/GlassWorkbench/
+          if-no-files-found: error

@@ -1,0 +1,182 @@
+OFFLINE OPTICAL MODEL NOTES — verified 2026-10-20
+
+Public wavelength arguments are vacuum micrometers. Refractive index returned
+by dispersion.refractive_index is relative to the fixed catalog reference air,
+not to a variable user atmosphere. Catalog spectral wavelengths use the familiar
+air values (C=656.2725 nm, d=587.5618 nm, F=486.1327 nm). Public spectral constants
+SPECTRAL_LINES_VACUUM convert these with dry Ciddor air at20C,101325Pa,450ppm CO2.
+The precise catalog humidity/CO2 convention was not established: this is a
+stated approximation, not an exact reconstruction of a manufacturer's lab.
+Reference-air conversion outside Ciddor's .3..1.7um range is also an approximation
+needed for source UV/IR checkpoints. Dispersion coverage is the supplied index
+coverage, not transmission coverage. Polynomial CDGM NIR extrapolation is rejected
+by default. N-BK7 on the catalog AIR axis at1.55um is1.5006520430195947;
+the public VACUUM-axis result at1.55um is1.5006572571349939.
+
+AUTHORITATIVE SOURCES READ
+SCHOTT TIE-19, August2023, page2, equations2–7, downloaded from official site
+and converted with Cherry's document converter:
+https://media.schott.com/api/public/content/0dcd87a2d36942a3946d033f0a9065e6?v=940fa3fb&download=true
+- Reference temperature20C; wavelength VACUUM um. Constants used as supplied,
+  no extra ppm scaling. Relative reference n in (n^2-1)/(2n) explicitly permitted.
+- n_abs(T)=n_rel(T0)*n_air_reference(T0)+prefactor*[D0*dT+D1*dT^2+D2*dT^3
+  +(E0*dT+E1*dT^2)/(lambda_vac^2-lambdaTK^2)]. Differentiate this expression;
+  n_rel=n_abs/n_air_user; dn_rel=(dn_abs-n_rel*dn_air_user)/n_air_user.
+- Stated coefficient validity:0.365..1.014um, -100..140C. Thus1550nm requires
+  explicit extrapolation even for SCHOTT Sellmeier glasses. The same document
+  tabulates1060nm despite its stated1014nm limit. This inconsistency is disclosed,
+  not silently resolved by widening the default range. Audit1060 uses opt-in.
+- We deliberately use full Ciddor for air, not TIE19's approximate older air formula.
+
+SCHOTT TIE-29, section3/Table1 and section4, official PDF converted with Cherry:
+https://media.schott.com/api/public/content/8afd09ccdf4243e890df9f875b1b5579?v=ff3f35d1&download=true
+- Dispersion evaluation uses Table1 wavelengths and only the spectral region where
+  index values are supplied. These include conventional air spectral values.
+- SCHOTT workbook abbreviated UV/NIR labels mapped to full Table1 wavelengths.
+- Catalog reference20C distinguished from22C measurement-certificate temperature.
+
+Ciddor1996, Applied Optics35,1566–1573 DOI10.1364/AO.35.001566.
+NIST Stone/Zimmerman Engineering Metrology Toolbox documentation, sectionVII
+Table1, retrieved and used as independent dry AND humid numerical test fixtures:
+https://emtoolbox.nist.gov/wavelength/Documentation.asp
+Ciddor equation constants cross-checked with published independent implementation:
+https://github.com/polyanskiy/refractiveindex.info-scripts/blob/main/scripts/Ciddor%201996%20-%20air.py
+- Full component-density/compressibility calculation with CO2 and humidity.
+- NIST uses IAPWS saturation; this code uses Ciddor/Davis saturation. Tests allow
+  2e-9 for that small difference and NIST's rounded table values, not a claimed
+  physical accuracy. Ciddor physical uncertainty is much greater (see NIST).
+- Public accepted envelope .3..1.7um,-40..100C,10..140kPa,0..2000ppmCO2.
+  NIST accepts10..140kPa but warns outside60..120; Ciddor originally suggests
+ 80..120kPa. Accepted envelope MUST NOT be mistaken for guaranteed accuracy.
+- RH fraction0..1, relative to ice below0C and water above. Reject x_water>=1.
+  High RH/vapor fraction raises uncertainty and possible droplet formation.
+- Five-point dn_air/dT at fixed pressure/CO2 and fixed RH by default, or fixed
+  water mole fraction inferred from RH AT THE EVALUATION TEMPERATURE. Selecting
+  fixed mole fraction changes the LOCAL DERIVATIVE, not air_index's state inputs.
+  At the freezing branch boundary the derivative is one-sided.
+
+CDGM UNVERIFIED / AUDITED ASSUMPTIONS
+Only the first optical-glass worksheet of CDGM202609.xlsx is imported.
+Official manufacturer thermal convention/range documentation was not recovered.
+The standard six-constant absolute-increment model at20C is a working assumption.
+CDGM values are therefore labelled unverified even when independent table checks
+agree. Source interval tables span-60..140C; outside requires extrapolation opt-in.
+Ciddor's narrower temperature bounds can also require opt-in.
+Source checkpoints/table disagreements are never corrected by modifying constants.
+
+AUDIT AND DEFAULT EXCLUSIONS
+Import audits dispersion against every supplied index checkpoint. Residual limits:
+CDGM1e-5; SCHOTT1.1e-5. These are disclosed screening checks, not promises that
+all source values can be reproduced to their printed rounding precision.
+28 CDGM rows exceed the dispersion threshold (worst ZF11 about5.16e-5); these
+are retained for maps/provenance but dispersion calculations reject by default.
+All122 SCHOTT pass after correctly mapping abbreviated UV labels.
+Import audits20..40C thermal INTERVAL AVERAGES against independent worksheet cells,
+not point derivatives. Check e/g/t/d for CDGM, e/g/1060 relative AND absolute for
+SCHOTT when cells are present. A0.3ppm/K residual guard flags19 CDGM rows.
+Some large conflicts: ZF10~1.83ppm/K, ZF50~1.74ppm/K, F13~1.60ppm/K. They are not
+credible as validated absolute-model coefficients and thermal use rejects by
+default. Explicit allow_extrapolation=True also opts into these audit failures;
+full warning strings remain attached to results. SCHOTT relative table residuals
+are under0.063ppm/K; absolute residuals under0.090ppm/K (P-SK60 absolute e-line
+is2.2103ppm/K versus tabulated2.3; not tuned to match). H-K9L e-line agrees
+within0.034ppm/K. This does not establish all
+CDGM coefficient conventions or NIR validity. No unavailable web comparison was
+fabricated or constants tuned to match a secondary calculator.
+
+CTE / TRANSMISSION / IMPORT
+CDGM BZ header explicitly states10^-7/K; SCHOTT DF uses conventional10^-6/K.
+N-BK7=7.1e-6/K; H-FK55=11.4e-6/K. Official TIE31 downloaded but Cherry reported
+OCR needed; hence this session did NOT independently read the CTE-unit statement
+from that PDF. Do not present that verification as completed.
+Only native10mm internal-transmission samples are used. No5mm/25mm mixing.
+Log(tau) interpolates between positive samples, no extrapolation. Zero endpoints
+are censored/rounded measurements and cannot support finite log interpolation.
+Transmission nominal wavelength axis/bandwidth was not documented; interpolation
+is explicitly approximate and not a measured1550nm value.
+Prices remain supplier-native; melt category MA is exact CDGM HV, not A.
+Original files are read-only, first worksheet only; source hashes/rows preserved.
+Source code strings preserve leading zeroes. Unsupported legacy and Corning files
+are never discovered as catalogs. No model performs runtime network requests.
+
+BUNDLED SUPPLEMENTS — SOURCE-NATIVE MODELS (2026-10-20)
+These are explicit offline records, not imports of Corning_FusedSilica.csv.
+They have separate dispersion/thermal dispatch; unknown or inconsistent models
+reject. Missing price and comparable 10-mm transmission remain unknown, not zero.
+source_hash is a deterministic SHA256 of the numeric record, model coefficients,
+and declared convention, NOT the hash of a downloaded manufacturer PDF.
+
+CORNING HPFS 7980 (NOT 7979/8655)
+Requested 2015 URL (partial retrieval only; direct download returned HTTP403):
+https://www.corning.com/media/worldwide/csm/documents/HPFS_Product_Brochure_All_Grades_2015_07_21.pdf
+Complete Corning February2014 brochure, downloaded/read from Edmund's copy:
+https://www.edmundoptics.de/ViewDocument/Corning%20Fused%20Silica%20Grades.pdf
+The HPFS7980 table gives22C,760mmHg,N2 and VACUUM wavelengths. Its three-term
+Sellmeier coefficients are (.683740494,.420323613,.585027480) with squared-pole
+values (.00460352869,.01339688560,64.4932732), wavelength in um.
+Its thermo-optic law is [9.390590+.235290/lambda^2-.001318560/lambda^4
++.000302887/lambda^6] ppm/K, stated20..25C. Use a linear extension anchored22C.
+The actual7980 fit spans0.184950..1.128950um (20 tabulated wavelengths);1550nm
+therefore REQUIRES extrapolation opt-in. Do not substitute the broader adjacent
+7979/8655 model. Independent table checkpoints include nd1.458461 at.587725um,
+nF1.463123 at.486269um, nC1.456364 at.656454um, ng1.466691 at.435957um,
+and n1.448866 at1.128950um. Vd and PgF derive from those rounded source indices;
+Vd~67.8297 is consistent with the brochure's rounded67.8, not a different material.
+Source CTE0.52ppm/K is an average5..35C, NOT a temperature-dependent CTE model.
+UNVERIFIED APPROVED WORKING ASSUMPTION: both source n and source dn/dT are
+nitrogen-relative, and nitrogen is approximated as dry Ciddor air at101325Pa,
+450ppmCO2. N2 measurement conditions alone do not establish this convention.
+Reference air follows temperature independently of the user's environment:
+n_abs=n_source*n_air_reference; dn_abs=dn_source*n_air_reference
++n_source*dn_air_reference. Then divide by user Ciddor air and differentiate
+that quotient. Source UV coverage outside Ciddor0.3..1.7um also needs opt-in.
+This assumption is explicitly returned in warnings and is NOT independently
+verified metrology. Native source evaluation is available separately for audit.
+
+SILICON — CHARMS2006 ABSOLUTE INDEX
+Frey, Leviton & Madison, Temperature-dependent refractive index of silicon and
+germanium,2006; complete saved PDF and converted text were read:
+https://arxiv.org/pdf/physics/0606168
+Table5: n_abs^2=1+sum[Si(T)*lambda^2/(lambda^2-Li(T)^2)], Si and Li fourth-order
+polynomials in KELVIN. Wavelength VACUUM um; Li is squared in denominator, not
+already squared. All signed coefficients were checked against Table5, including
+negative S3 T^2, negative L3 T/T^2/T^3 and positive S3/L3 T^4. Differentiate both
+Si and Li analytically; native model20..300K and1.1..5.6um. No extra air product.
+Visible/short-wave lambda<1.1um HARD REJECTS even with opt-in. nd/Vd/PgF are None.
+Table2 independently reproduces, e.g.,1.5um295K n3.48314 and2um200K n3.43863.
+IMPORTANT PUBLISHED DIFFERENCE: Table4 dn/dT at1.5um295K is187ppm/K while the
+analytic derivative of Table5 is177.46194ppm/K (difference9.53806ppm/K). This is
+disclosed, not hidden or corrected by tuning the model. Results use the internally
+consistent analytic derivative of the published Table5 index fit. Tests separately
+check Table2 indices, finite differences and this Table4 discrepancy. Batch-specific
+source data is not a universal melt guarantee. User-relative results additionally
+need air-model opt-in beyond its narrower wavelength/temperature validity.
+Nominal linear CTE2.6ppm/K independently verified in saved Ioffe HTML:
+https://www.ioffe.ru/SVA/NSM/Semicond/Si/thermal.html
+Ioffe summary does not specify a temperature interval; do not treat the constant
+as a cryogenic CTE model. Use it as nominal near-room-temperature screening only.
+
+1550nm,20C,101325Pa,dry450ppmCO2 numerical audit (not a new measurement):
+7980: n_rel1.44396753833833,n_abs1.44435536761935,
+      dn_rel9.48831888527ppm/K,dn_abs8.16408489666ppm/K (EXTRAPOLATED).
+Si:   n_rel3.47752570151455,n_abs3.47845971578892,
+      dn_rel179.220970108ppm/K,dn_abs176.073799071ppm/K.
+Both use the exact quotient/product derivative identity. Analytic source and
+end-to-end derivative checks include fixed RH and fixed water mole fraction.
+
+AGF CATALOG WORKSPACE — v0.3
+AGF import is a separate raw-record/typed-inspection layer, not conversion into the
+calculation Glass model. Existing calculation pools and first-sheet-only workbook
+rules are unchanged. Preserve imported coefficient text, extra records, arbitrary
+transmission thicknesses and source diagnostics; do not infer zero thermal response
+from absent/empty TD. Unsupported local formulas remain inspectable and preservable.
+Workbook exports use formula1 polynomial or formula2 Sellmeier with AGF paired
+coefficient ordering. SI CTE is multiplied by1e6. PgF is not dPgF. Missing physical
+data are not zero-filled. LD derived from spectral checkpoints is a working range,
+not manufacturer-certified dispersion validity. All source assumptions and omissions
+must remain visible in preview and accompanying provenance. Standard AGF export of
+the bundled Corning/silicon models is not supported; no fitting is hidden in export.
+Mixed catalogs use UTF-16LE BOM/CRLF; text preservation is not byte-identical merging.
+Structural validation does not establish native OpticStudio acceptance or accuracy.
+Format: Ansys OpticStudio User Guide, The AGF & BGF File Formats:
+https://ansyshelp.ansys.com/public/Views/Secured/Zemax/v251/en/OpticStudio_User_Guide/OpticStudio_Help/topics/The_AGF_BGF_File_Formats.html
