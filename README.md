@@ -68,6 +68,29 @@ GlassWorkbench/
 
 To upgrade, save your exports, close the running application, and extract the new release into a separate folder. The release ZIP includes the two standard catalogs; if you use additional custom catalogs, copy those into the new folder or select their existing locations. Do not overwrite a running executable.
 
+### First launch: Windows SmartScreen warning
+
+When you run `GlassWorkbench.exe` for the first time on Windows, Microsoft Defender SmartScreen may display this warning:
+
+> **Windows protected your PC**
+>
+> Microsoft Defender SmartScreen prevented an unrecognized app from starting. Running this app might put your PC at risk.
+
+If you downloaded the application from this repository's Releases page and trust the file, select **More info**, then **Run anyway**, if that option is available.
+
+#### Unblock the file via Properties
+
+If Windows continues to block the file when you try to open it:
+
+1. Right-click `GlassWorkbench.exe` (or the installer file, if applicable) and select **Properties**.
+2. Near the bottom of the **General** tab, look for the **Security** section.
+3. Check **Unblock** next to *"This file came from another computer and might be blocked to help protect this computer."*
+4. Click **Apply**, then **OK**, and launch the application again.
+
+For the portable ZIP, you can also unblock the downloaded ZIP through **Properties** before extracting all its contents into a new folder.
+
+**Unblock** removes the downloaded-file restriction for that file; it does not disable Microsoft Defender or SmartScreen system-wide. If the checkbox is absent or your organization still blocks the application, these steps may not apply; follow your organization's security policy.
+
 ### Platform support
 
 | Platform | Recommended route | Verification status |
@@ -281,6 +304,7 @@ The **CDGM thermal convention remains a table-tested assumption, not independent
 
 | Symptom | What to check |
 | --- | --- |
+| Windows displays “Windows protected your PC” | See [First launch: Windows SmartScreen warning](#first-launch-windows-smartscreen-warning) for the file-specific unblock steps. |
 | EXE fails to start or reports missing DLLs | Extract the complete Windows ZIP. Keep the EXE and its `_internal` directory together; do not copy only the EXE. |
 | No Excel glasses appear | Use **Load Excel catalogs…** to select the two supported workbooks. For automatic discovery, place them beside the portable EXE or in the source project root. |
 | A glass disappears after filtering | Review supplier, name preset, melt category, name-prefix, and supplemental selections. A missing melt category is not the same as MA. |
