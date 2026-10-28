@@ -8,6 +8,7 @@ An offline desktop application to explore optical glass catalogs, calculate refr
 
 ## Contents
 
+- [Windows application examples](#windows-application-examples)
 - [Install on Windows](#install-on-windows)
 - [Quick start and in-app Help](#quick-start-and-in-app-help)
 - [Run from source](#run-from-source)
@@ -18,6 +19,30 @@ An offline desktop application to explore optical glass catalogs, calculate refr
 - [Troubleshooting](#troubleshooting)
 - [Tests](#tests)
 - [Portable builds](#portable-builds)
+
+## Windows application examples
+
+These screenshots show the published **v0.4.2 Windows x64 portable application** running on a Windows GitHub Actions runner, with the supplied manufacturer catalogs loaded. They are actual application captures, not mockups. Window decorations and scaling can vary with your Windows display settings.
+
+### Glass maps and material table
+
+Browse optical materials, compare the refractive-index/Abbe-number maps, and narrow the list with the supplier and material filters.
+
+![Windows application — glass maps and material table](docs/images/windows-main.png)
+
+### AGF catalog management
+
+Inspect the supplied `MISC.AGF` catalog alongside the loaded Excel materials, select entries, and prepare an export basket.
+
+![Windows application — AGF catalog management](docs/images/windows-agf.png)
+
+### Built-in offline Help
+
+Open the built-in manual with **Help** or **F1** without leaving the application.
+
+![Windows application — offline Help](docs/images/windows-help.png)
+
+Capture procedure and provenance: [screenshot notes](docs/images/README.md).
 
 ## Install on Windows
 
