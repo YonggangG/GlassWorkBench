@@ -51,13 +51,9 @@ Capture procedure and provenance: [screenshot notes](docs/images/README.md).
 1. Open this repository’s [Releases page](https://github.com/YonggangG/GlassWorkBench/releases) and select the desired release.
 2. Download **`GlassWorkbench-v0.4.2-Windows-x64.zip`**, or the equivalent Windows ZIP for a newer release. GitHub's automatically generated **Source code (zip)** is not the ready-to-run application.
 3. Extract **all** ZIP contents to a writable local folder. Do not run the EXE from inside the ZIP.
-4. Download the two public manufacturer workbooks from the repository or release attachments if they are not already included:
-   - `CDGM202609.xlsx`
-   - `schott-optical-glass-overview-excel-format-en 202501113.xlsx`
-5. Place the workbooks beside `GlassWorkbench.exe` for automatic discovery, or open them later with **Load Excel catalogs…**.
-6. Double-click **`GlassWorkbench.exe`**.
+4. Double-click **`GlassWorkbench.exe`**. The two bundled manufacturer catalogs are discovered automatically.
 
-The existing v0.4.2 Windows ZIP contains the application and its runtime dependencies, **but not the Excel workbooks**. After adding the catalogs, the application folder should look like this:
+The Windows ZIP already includes the application, its runtime dependencies, and both Excel workbooks: **`CDGM202609.xlsx`** and **`schott-optical-glass-overview-excel-format-en 202501113.xlsx`**. **No separate catalog download is needed.** After extraction, the application folder should look like this:
 
 ```text
 GlassWorkbench/
@@ -70,7 +66,7 @@ GlassWorkbench/
 
 **Keep `_internal` alongside the EXE.** The executable is not a standalone single-file build. No installer, administrator installation, Python, uv, Excel, or OpticStudio is required for the portable app. Windows may apply your organization's download/security policy; use a trusted release and follow that policy rather than disabling protection.
 
-To upgrade, save your exports, close the running application, and extract the new release into a separate folder. Copy the catalogs into the new application folder or select their existing locations. Do not overwrite a running executable.
+To upgrade, save your exports, close the running application, and extract the new release into a separate folder. The release ZIP includes the two standard catalogs; if you use additional custom catalogs, copy those into the new folder or select their existing locations. Do not overwrite a running executable.
 
 ### Platform support
 
@@ -83,7 +79,7 @@ To upgrade, save your exports, close the running application, and extract the ne
 
 Click **Help** at the top of the window, or press **F1**, to read this manual in a formatted, resizable viewer with section navigation. Help is included in the portable application and Python package and is available offline; opening an external reference link deliberately may require internet access.
 
-1. Load the two official Excel catalogs using **Load Excel catalogs…**. Only their first worksheets are read. AGF catalog management also works without Excel files.
+1. The Windows portable app automatically discovers the two included official Excel catalogs beside the EXE. Use **Load Excel catalogs…** if you want to select files manually. Only their first worksheets are read. AGF catalog management also works without Excel files.
 2. Choose global filters and a work area below. Inspect source/model details and warnings before using calculated results.
 3. For **Cooke / Athermal 1550**, review the editable mounting/housing CTE as well as the wavelength, temperature, transmission and extrapolation settings.
 4. For catalog export, open **AGF Catalogs**, add chosen materials to the export basket, review names and comments, then validate and save a new AGF plus its provenance report.
@@ -121,7 +117,7 @@ Use a normal desktop session for interactive operation. `QT_QPA_PLATFORM=offscre
 
 ## Excel glass catalogs
 
-The two public manufacturer workbooks below are the intended catalogs for this repository/release. Use the copies provided with the repository or as separate release attachments. If they are absent from a particular download, obtain the matching manufacturer catalogs separately. Place them in the project directory when running from source, beside the EXE for a portable build, or select their locations in the application:
+The two public manufacturer workbooks below are included in the Windows release ZIP, beside `GlassWorkbench.exe`, and in the source repository. Windows portable users do not need to download them separately. When running from source, keep them in the project directory, or select their locations in the application:
 
 | File | Imported worksheet | Expected records in the supplied edition |
 | --- | --- | ---: |
@@ -332,7 +328,7 @@ Both scripts run `uv sync --group dev` and build `packaging/GlassWorkbench.spec`
 - Windows executable: `dist/GlassWorkbench/GlassWorkbench.exe`
 - Linux executable: `dist/GlassWorkbench/GlassWorkbench`
 
-Distribute the **entire GlassWorkbench directory**, including `_internal`, not just the executable. The frozen entry wrapper uses an absolute package import and changes the working directory to the executable's directory. Place authorized external catalogs beside the executable for discovery, or use explicit file selection. No Excel catalogs, presentation, or legacy data files are included by the spec. A recipient of a portable build does not need Python or uv, but Linux still needs compatible system libraries. Build Linux releases on the oldest Ubuntu version you intend to support and test on each supported target.
+Distribute the **entire GlassWorkbench directory**, including `_internal`, not just the executable. The frozen entry wrapper uses an absolute package import and changes the working directory to the executable's directory. Place authorized external catalogs beside the executable for discovery, or use explicit file selection. The PyInstaller spec itself does not copy Excel catalogs, presentations, or legacy data files. The published Windows release ZIP includes the two Excel catalogs alongside the built application; include them explicitly when assembling your own equivalent ZIP. A recipient of a portable build does not need Python or uv, but Linux still needs compatible system libraries. Build Linux releases on the oldest Ubuntu version you intend to support and test on each supported target.
 
 The workflow uploads only the generated application directory, never external source catalogs. Offscreen source tests are not a packaged interactive smoke test: validate startup, catalog selection, calculations, and exports on each release target before distribution.
 
